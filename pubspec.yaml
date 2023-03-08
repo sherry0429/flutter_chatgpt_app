@@ -38,7 +38,6 @@ dependencies:
   flutter_svg: ^0.22.0
   http: ^0.13.3
   provider: ^5.0.0
-  system_proxy: 0.1.0
 
 dev_dependencies:
   flutter_test:

@@ -1,60 +1,41 @@
 import 'dart:io';
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:system_proxy/system_proxy.dart';
-
 import 'chatpage.dart';
 import 'drawer.dart';
 import 'conversation_provider.dart';
 import 'popmenu.dart';
 
 
-class NewSystemProxy extends SystemProxy {
+class NewSystemProxy {
 
   static const MethodChannel _channel = MethodChannel('system_proxy');
 
   static Future<Map<String, String>?> getProxySettings() async {
+    var proxy = {
+      "host": "",
+      "port": ""
+    };
     if (Platform.isAndroid) {
-
-      dynamic proxySettingRes = await _channel.invokeMethod('getProxySettings');
-      if (proxySettingRes != null) {
-        Map<String, dynamic> proxySetting = Map<String, dynamic>.from(proxySettingRes);
-        return {
-          "port": proxySetting['port'].toString(),
-          "host": proxySetting['host'].toString(),
-        };
-      }
-    }
-    else if (Platform.isIOS) {
-      // 有代理时
-      // {FTPPassive: 1, HTTPEnable: 1, HTTPPort: 8899, HTTPSProxy: 127.0.0.1, HTTPSPort: 8899, __SCOPED__: {en0: {HTTPEnable: 1, HTTPPort: 8899, HTTPSProxy: 127.0.0.1, HTTPSPort: 8899, FTPPassive: 1, HTTPProxy: 127.0.0.1, SOCKSEnable: 0, HTTPSEnable: 1}}, HTTPProxy: 127.0.0.1, HTTPSEnable: 1, SOCKSEnable: 0}
-      // 无代理时
-      // {FTPPassive: 1, HTTPEnable: 0, __SCOPED__: {en0: {HTTPEnable: 0, FTPPassive: 1, SOCKSEnable: 0, HTTPSEnable: 0}}, HTTPSEnable: 0, SOCKSEnable: 0}
-      dynamic proxySettingRes = await _channel.invokeMethod('getProxySettings');
-      Map<String, dynamic> proxySetting = Map<String, dynamic>.from(proxySettingRes);
-      if (proxySetting['HTTPEnable'] == 1) {
-        return {
-          "port": proxySetting['HTTPPort'].toString(),
-          "host": proxySetting['HTTPProxy'].toString(),
-        };
+      String proxyStr = await _channel.invokeMethod('getProxySettings');
+      print("hi $proxyStr");
+      if (proxyStr != "") {
+        List<String> args = proxyStr.split(":");
+        proxy['host'] = args[0];
+        proxy['port'] = args[1];
       }
     }
     else if (Platform.isWindows) {
       String proxyStr = await _channel.invokeMethod('getProxySettings');
       if (proxyStr != ""){
         List<String> args = proxyStr.split(":");
-        return {
-          "host": args[0],
-          "port": args[1],
-        };
+        proxy['host'] = args[0];
+        proxy['port'] = args[1];
       }
-      return null;
-      // Map<String, dynamic> proxySetting = Map<String, dynamic>.from(proxySettingRes);
-      // print(proxySetting);
     }
-    return null;
+    return proxy;
   }
 }
 
@@ -72,7 +53,7 @@ class ProxiedHttpOverrides extends HttpOverrides {
         if (_host != "" && _port != "") {
           return _host != null ? "PROXY $_host:$_port;" : 'DIRECT';
         } else {
-          return "";
+          return "DIRECT";
         }
       };
   }

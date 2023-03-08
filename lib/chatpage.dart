@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -20,6 +21,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  static const MethodChannel _channel = MethodChannel('system_proxy');
   HttpClient _client = HttpClient();
   FocusNode _focusNode = FocusNode();
 
@@ -45,8 +47,8 @@ class _ChatPageState extends State<ChatPage> {
       'messages': messages,
     };
 
-    print(apiKey);
     try {
+      // todo if android, native call to send requests (so will processed by VPN)
       return await _client.postUrl(url).then(
               (HttpClientRequest request) {
             request.headers.set('Content-Type', 'application/json');
