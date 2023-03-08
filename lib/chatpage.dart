@@ -37,7 +37,6 @@ class _ChatPageState extends State<ChatPage> {
   Future<Message?> _sendMessage(List<Map<String, String>> messages) async {
     final url = Uri.parse('https://api.openai.com/v1/chat/completions');
     final apiKey = Provider.of<ConversationProvider>(context, listen: false).yourapikey;
-    final proxy = Provider.of<ConversationProvider>(context, listen: false).yourproxy;
     final converter = JsonUtf8Encoder();
 
     // send all current conversation to OpenAI
@@ -45,17 +44,8 @@ class _ChatPageState extends State<ChatPage> {
       'model': model,
       'messages': messages,
     };
-    // _client.findProxy = HttpClient.findProxyFromEnvironment;
-    if (proxy != "") {
-      _client.findProxy = (url) {
-        return HttpClient.findProxyFromEnvironment(
-            url, environment: {
-          "http_proxy": proxy,
-          "https_proxy": proxy
-        });
-      };
-    }
 
+    print(apiKey);
     try {
       return await _client.postUrl(url).then(
               (HttpClientRequest request) {
@@ -66,6 +56,8 @@ class _ChatPageState extends State<ChatPage> {
           }
       ).then((HttpClientResponse response) async {
         var retBody = await response.transform(utf8.decoder).join();
+        print(response.statusCode);
+        print(retBody);
         if (response.statusCode == 200) {
           final data = json.decode(retBody);
           final completions = data['choices'] as List<dynamic>;

@@ -6,7 +6,6 @@ class ConversationProvider extends ChangeNotifier {
   List<Conversation> _conversations = [];
   int _currentConversationIndex = 0;
   String apikey = "YOUR_API_KEY";
-  String proxy = "";
   List<Conversation> get conversations => _conversations;
   int get currentConversationIndex => _currentConversationIndex;
   String get currentConversationTitle =>
@@ -14,7 +13,6 @@ class ConversationProvider extends ChangeNotifier {
   int get currentConversationLength =>
       _conversations[_currentConversationIndex].messages.length;
   String get yourapikey => apikey;
-  String get yourproxy => proxy;
   Conversation get currentConversation =>
       _conversations[_currentConversationIndex];
   // get current conversation's messages format
@@ -58,11 +56,6 @@ class ConversationProvider extends ChangeNotifier {
   // change api key
   set yourapikey(String value) {
     apikey = value;
-    notifyListeners();
-  }
-
-  set yourproxy(String value) {
-    proxy = value;
     notifyListeners();
   }
 
