@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'models.dart';
 
 class ConversationProvider extends ChangeNotifier {
   List<Conversation> _conversations = [];
   int _currentConversationIndex = 0;
-  String apikey = "YOUR_API_KEY";
+  String apikey = "";
+  String groupId = "";
   List<Conversation> get conversations => _conversations;
   int get currentConversationIndex => _currentConversationIndex;
   String get currentConversationTitle =>
@@ -13,6 +13,7 @@ class ConversationProvider extends ChangeNotifier {
   int get currentConversationLength =>
       _conversations[_currentConversationIndex].messages.length;
   String get yourapikey => apikey;
+  String get yourgroupid => groupId;
   Conversation get currentConversation =>
       _conversations[_currentConversationIndex];
   // get current conversation's messages format
@@ -20,17 +21,13 @@ class ConversationProvider extends ChangeNotifier {
   //   {'role': 'user', 'content': text},
   // ],
   List<Map<String, String>> get currentConversationMessages {
-    List<Map<String, String>> messages = [
-      {
-        'role': "system",
-        'content': "",
-      }
-    ];
+    List<Map<String, String>> messages = [];
     for (Message message
         in _conversations[_currentConversationIndex].messages) {
       messages.add({
-        'role': message.senderId == 'User' ? 'user' : 'system',
-        'content': message.content
+        'sender_type': message.senderId == 'User' ? 'USER' : 'BOT',
+        'sender_name': message.senderId == 'User' ? '' : '',
+        'text': message.content
       });
     }
     return messages;
@@ -59,10 +56,22 @@ class ConversationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  set yourgroupid(String value) {
+    groupId = value;
+    notifyListeners();
+  }
+
   // add to current conversation
   void addMessage(Message message) {
     _conversations[_currentConversationIndex].messages.add(message);
     notifyListeners();
+  }
+
+  void delLastMessage() {
+    if (_conversations.isNotEmpty && _conversations[_currentConversationIndex].messages.isNotEmpty) {
+      _conversations[_currentConversationIndex].messages.removeLast();
+      notifyListeners();
+    }
   }
 
   // add a new empty conversation
