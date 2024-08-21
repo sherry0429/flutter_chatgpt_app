@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'dart:io';
 import 'conversation_provider.dart';
 import 'models.dart';
 import 'secrets.dart';
@@ -17,7 +17,7 @@ class MyDrawer extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {
                   Provider.of<ConversationProvider>(context, listen: false)
-                      .addEmptyConversation('');
+                      .addEmptyConversation('', '');
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -75,36 +75,59 @@ class MyDrawer extends StatelessWidget {
                               // border: Border.all(color: Color(Colors.grey[200]?.value ?? 0)),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            child: Stack(
                               children: [
-                                // coversation icon
-                                Icon(
-                                  Icons.person,
-                                  color: conversationProvider
-                                              .currentConversationIndex ==
-                                          index
-                                      ? Colors.white
-                                      : Colors.grey[700],
-                                  size: 20.0,
-                                ),
-                                const SizedBox(width: 15.0),
-                                Text(
-                                  conversation.title,
-                                  style: TextStyle(
-                                    // fontWeight: FontWeight.bold,
-                                    color: conversationProvider
-                                                .currentConversationIndex ==
-                                            index
-                                        ? Colors.white
-                                        : Colors.grey[700],
-                                    fontFamily: 'din-regular',
+                                // 背景图
+                                if (conversationProvider.currentConversation.imagePath != null && conversationProvider.currentConversation.imagePath.isNotEmpty)
+                                  Positioned.fill(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.file(
+                                        File(conversation.imagePath),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                 Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: conversationProvider.currentConversationIndex == index
+                                        ? const Color(0xff55bb8e).withOpacity(0.7)
+                                        : Colors.white.withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // coversation icon
+                                      Icon(
+                                        Icons.person,
+                                        color: conversationProvider
+                                                    .currentConversationIndex ==
+                                                index
+                                            ? Colors.white
+                                            : Colors.grey[700],
+                                        size: 20.0,
+                                      ),
+                                      const SizedBox(width: 15.0),
+                                      Text(
+                                        conversation.title,
+                                        style: TextStyle(
+                                          // fontWeight: FontWeight.bold,
+                                          color: conversationProvider
+                                                      .currentConversationIndex ==
+                                                  index
+                                              ? Colors.white
+                                              : Colors.grey[700],
+                                          fontFamily: 'din-regular',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                 )
+                              ],)
                             ),
                           ),
-                        ),
                       );
                     },
                   );
